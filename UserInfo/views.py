@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from UserInfo.customPermissions import CustomizeAPIPermissions
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -50,3 +51,64 @@ def get_token(user, username, id):
                         'logged_user_id': user.id
                         }
     return response_to_be_send
+
+class GetSinglestudent(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [CustomizeAPIPermissions]
+
+    def get(self, request, pk = None):
+                try:
+                    instance = TutleeUser.objects.get(id = pk)
+                except:
+                    return Response("User Not exists ", status = status.HTTP_404_NOT_FOUND)
+                self.check_object_permissions(request, instance)
+                serialized = TutleeUserSerializer(instance)
+                return Response(serialized.data) 
+
+#It is for admin use
+
+# class GetRegisterterdStudents(APIView):
+#     # authentication_classes = [JWTAuthentication]
+#     # permission_classes = [CustomizeAPIPermissions]
+
+#     def get(self, request):
+#         user = TutleeUser.objects.all()
+#         serialized = TutleeUserSerializer(user, many = True)
+#         return Response(serialized.data)
+
+class UpdateStudent(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [CustomizeAPIPermissions]
+
+    def put(self, request, pk = None):
+        instance = TutleeUser.objects.get(id = pk)
+        self.check_object_permissions(request, instance)
+        data = request.data
+        serialized = TutleeUserSerializer(instance, data = data)
+        if not serialized.is_valid():
+            return Response(serialized.errors, status = status.HTTP_400_BAD_REQUEST)   
+        serialized.save()
+        return Response(serialized.data)                   
+    
+    def patch(self, request, pk = None):
+        instance=TutleeUser.objects.get(id = pk)
+        self.check_object_permissions(request, instance)
+        data = request.data
+        serialized = TutleeUserSerializer(instance, data = data, partial = True)
+        if not serialized.is_valid():
+            return Response(serialized.errors, status = status.HTTP_400_BAD_REQUEST)   
+        serialized.save()
+        return Response(serialized.data)   
+
+class DeleteStudent(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [CustomizeAPIPermissions]
+
+    def delete(self, request, pk = None):
+            try:
+                instance = TutleeUser.objects.get(id = pk)
+            except:
+                return Response({'output':"Student not even exists!!"},status=status.HTTP_404_NOT_FOUND)
+            self.check_object_permissions(request, instance)
+            instance.delete()
+            return Response({'output':"Deleted successfully!!"})

@@ -9,4 +9,7 @@ urlpatterns=[
     path('gettoken/', TokenObtainPairView.as_view()),
     path('refresh/', TokenRefreshView.as_view()),
     path('varify/', TokenVerifyView.as_view()),
-    path('login/', login_user,name = 'login'),]
+    path('login/', login_user,name = 'login'),
+    path('studentDetail/<int:pk>', GetSinglestudent.as_view(), name = 'studentDetail'),
+    path('updateStudentProfile/<int:pk>', UpdateStudent.as_view(), name = 'updateUser'),
+    path('DeleteStudentProfile/<int:pk>', DeleteStudent.as_view(), name = 'DeleteStudentProfile'),]

@@ -26,7 +26,7 @@ class TutleeUserSerializer(serializers.ModelSerializer):
         return user
     
     def update(self, instance, validated_data):
-        instance.username = validated_data.get('email', instance.email)
+        instance.username = validated_data.get('email', instance.username)
         instance.email = validated_data.get('email', instance.email)
         instance.address = validated_data.get('address', instance.address)
         instance.first_name = validated_data.get('first_name', instance.first_name)
