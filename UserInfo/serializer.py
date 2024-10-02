@@ -67,7 +67,7 @@ class AdditionInfoSerializer(serializers.ModelSerializer):
             school_name = validated_data['school_name']
             short_term_goals = validated_data['short_term_goals']
             long_term_goals = validated_data['long_term_goals']
-            user = AdditionalInfo.objects.get_or_create(
+            user = AdditionalInfo.objects.create(
                                     student = student,
                                     age = age,
                                     picture = picture,
@@ -76,8 +76,8 @@ class AdditionInfoSerializer(serializers.ModelSerializer):
                                     short_term_goals = short_term_goals,
                                     long_term_goals = long_term_goals 
                                 )
-            if not user:
-                user.save()
+            
+            user.save()
             return user
 
     def update(self, instance, validated_data):

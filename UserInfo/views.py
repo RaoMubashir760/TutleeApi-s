@@ -126,10 +126,11 @@ class AddAdditionalInfo(APIView):
         context = {
              'student' : student
         }
-        serialized = AdditionInfoSerializer(data = data, many = False,context = context)
+        serialized = AdditionInfoSerializer(data = data, many = False, context = context)
         if not serialized.is_valid():
             return Response(f"your data is Incomplete, {serialized.errors}", status = status.HTTP_400_BAD_REQUEST)
         serialized.save()
+        print(serialized.data)
         return Response(serialized.data, status = status.HTTP_201_CREATED)
 
 class GetStudentAdditionalInfo(APIView):
