@@ -14,9 +14,10 @@ class TutleeUser(AbstractUser):
     class Meta:
         verbose_name = 'TutleeUser'
 
-class AdditionInfo(models.Model):
-    student = models.OneToOneField('TutleeUser', null=False, blank=False, related_name='student_against_this_info', on_delete=models.CASCADE)
+class AdditionalInfo(models.Model):
+    student = models.OneToOneField(TutleeUser, null = False, blank = True, related_name='student_against_this_info', on_delete = models.CASCADE)
     age = models.IntegerField(null = False, blank = False)
+    location = models.CharField(max_length = 100, null = False, blank = False)
     picture = models.ImageField(upload_to = 'student_pictures/', null = True, blank = True)
     school_name = models.CharField(max_length = 255, null = True, blank = True)   
     short_term_goals = models.TextField(null = True, blank = True)
@@ -26,7 +27,7 @@ class AdditionInfo(models.Model):
         return f"Additional Info for {self.student}"
     
 class Prefrences(models.Model):
-    student = models.OneToOneField('TutleeUser', null=False, blank=False, related_name='student_against_these_preferences', on_delete=models.CASCADE)
+    student = models.OneToOneField(TutleeUser, null=False, blank=False, related_name='student_against_these_preferences', on_delete=models.CASCADE)
     subjects_of_interest = models.TextField(null = True, blank = True)  
     learning_goals = models.TextField(null = True, blank = True) 
     preferred_learning_style = models.CharField(max_length = 255, null = True, blank = True) 

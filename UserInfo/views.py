@@ -3,16 +3,15 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from UserInfo.customPermissions import CustomizeAPIPermissions
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .serializer import TutleeUserSerializer, LoginSerializer
+from .serializer import TutleeUserSerializer, LoginSerializer, AdditionInfoSerializer
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
-from UserInfo.models import TutleeUser
+from UserInfo.models import TutleeUser, AdditionalInfo
 
 #User only have to enter the mail, For authentication perpose we have to add the username: that is actually the mail
 @api_view(['POST'])
 def register_user(request):
-            print(request.data)
             data = request.data.copy()
             data['username'] = data.get('email')
             serialized = TutleeUserSerializer(data = data, many = False)
@@ -61,7 +60,7 @@ class GetSinglestudent(APIView):
                     instance = TutleeUser.objects.get(id = pk)
                 except:
                     return Response("User Not exists ", status = status.HTTP_404_NOT_FOUND)
-                self.check_object_permissions(request, instance)
+                # self.check_object_permissions(request, instance)
                 serialized = TutleeUserSerializer(instance)
                 return Response(serialized.data) 
 
@@ -82,7 +81,7 @@ class UpdateStudent(APIView):
 
     def put(self, request, pk = None):
         instance = TutleeUser.objects.get(id = pk)
-        self.check_object_permissions(request, instance)
+        # self.check_object_permissions(request, instance)
         data = request.data
         serialized = TutleeUserSerializer(instance, data = data)
         if not serialized.is_valid():
@@ -92,7 +91,7 @@ class UpdateStudent(APIView):
     
     def patch(self, request, pk = None):
         instance=TutleeUser.objects.get(id = pk)
-        self.check_object_permissions(request, instance)
+        # self.check_object_permissions(request, instance)
         data = request.data
         serialized = TutleeUserSerializer(instance, data = data, partial = True)
         if not serialized.is_valid():
@@ -109,6 +108,77 @@ class DeleteStudent(APIView):
                 instance = TutleeUser.objects.get(id = pk)
             except:
                 return Response({'output':"Student not even exists!!"},status=status.HTTP_404_NOT_FOUND)
-            self.check_object_permissions(request, instance)
+            # self.check_object_permissions(request, instance)
             instance.delete()
             return Response({'output':"Deleted successfully!!"})
+    
+# For additional User info
+class AddAdditionalInfo(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [CustomizeAPIPermissions]
+
+    def post(self, request, pk = None):
+        data = request.data.copy()
+        try:
+            student = TutleeUser.objects.get(id = pk)
+        except:
+            return Response({'output': "User not exists"},status = status.HTTP_404_NOT_FOUND)
+        context = {
+             'student' : student
+        }
+        serialized = AdditionInfoSerializer(data = data, many = False,context = context)
+        if not serialized.is_valid():
+            return Response(f"your data is Incomplete, {serialized.errors}", status = status.HTTP_400_BAD_REQUEST)
+        serialized.save()
+        return Response(serialized.data, status = status.HTTP_201_CREATED)
+
+class GetStudentAdditionalInfo(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [CustomizeAPIPermissions]
+
+    def get(self, request, pk = None):
+        try:
+            instance = AdditionalInfo.objects.get(student = pk)
+            print(" :",instance)
+        except:
+            return Response("User info Not exists ", status = status.HTTP_404_NOT_FOUND)
+        # self.check_object_permissions(request, instance)
+        serialized = AdditionInfoSerializer(instance)
+        return Response(serialized.data) 
+
+class UpdateAdditionalInfo(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [CustomizeAPIPermissions]
+
+    def put(self, request, pk = None):
+        instance = AdditionalInfo.objects.get(student = pk)
+        # self.check_object_permissions(request, instance)
+        data = request.data
+        serialized = AdditionInfoSerializer(instance, data = data)
+        if not serialized.is_valid():
+            return Response(serialized.errors, status = status.HTTP_400_BAD_REQUEST)   
+        serialized.save()
+        return Response(serialized.data)                   
+    
+    def patch(self, request, pk = None):
+        instance = AdditionalInfo.objects.get(student = pk)
+        # self.check_object_permissions(request, instance)
+        data = request.data
+        serialized = AdditionInfoSerializer(instance, data = data, partial = True)
+        if not serialized.is_valid():
+            return Response(serialized.errors, status = status.HTTP_400_BAD_REQUEST)   
+        serialized.save()
+        return Response(serialized.data)   
+
+class DeleteAdditionalInfo(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [CustomizeAPIPermissions]
+
+    def delete(self, request, pk = None):
+            try:
+                instance = AdditionalInfo.objects.get(student = pk)
+            except:
+                return Response({'output':"Student Info not even exists!!"},status=status.HTTP_404_NOT_FOUND)
+            # self.check_object_permissions(request, instance)
+            instance.delete()
+            return Response({'output':"Info Deleted successfully!!"})
