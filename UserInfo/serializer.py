@@ -10,7 +10,6 @@ class TutleeUserSerializer(serializers.ModelSerializer):
         model = TutleeUser
         fields = ['username', 'email', 'first_name', 'last_name', 'address', 'password', 'confirm_password']
 
-    
     def create(self, validated_data):
         useremail = validated_data['email']
         password = validated_data['password']
@@ -76,7 +75,6 @@ class AdditionInfoSerializer(serializers.ModelSerializer):
                                     short_term_goals = short_term_goals,
                                     long_term_goals = long_term_goals 
                                 )
-            
             user.save()
             return user
 
@@ -88,7 +86,52 @@ class AdditionInfoSerializer(serializers.ModelSerializer):
             instance.long_term_goals = validated_data.get('long_term_goals', instance.long_term_goals)
             instance.picture = validated_data.get('picture', instance.picture)
             instance.save()
-            return instance    
+            return instance
+
+class PrefrenceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Prefrences
+        fields = ['subjects_of_interest', 'learning_goals', 'tutoring_preference', 'frequency_of_tutoring_sessions',
+                  'preferred_learning_style', 'study_schedule_preferences', 'mode_of_learning']
+
+    def create(self, validated_data):
+        student = self.context['student']
+        try:
+            user_info = Prefrences.objects.get(student = student)
+            # If the record exists, you can either update or return an error
+            raise serializers.ValidationError(f"AdditionalInfo for this student already exists.{user_info}")
+        except Prefrences.DoesNotExist:
+            subjects_of_interest = validated_data['subjects_of_interest']
+            learning_goals = validated_data['learning_goals']
+            tutoring_preference = validated_data['tutoring_preference']
+            frequency_of_tutoring_sessions = validated_data['frequency_of_tutoring_sessions']
+            preferred_learning_style = validated_data['preferred_learning_style']
+            study_schedule_preferences = validated_data['study_schedule_preferences']
+            mode_of_learning = validated_data['mode_of_learning']
+            user = Prefrences.objects.create(
+                                    student = student,
+                                    subjects_of_interest = subjects_of_interest,
+                                    learning_goals = learning_goals,
+                                    tutoring_preference = tutoring_preference,
+                                    frequency_of_tutoring_sessions = frequency_of_tutoring_sessions,
+                                    preferred_learning_style = preferred_learning_style,
+                                    study_schedule_preferences = study_schedule_preferences,
+                                    mode_of_learning = mode_of_learning
+                                )
+            user.save()
+            return user
+
+    def update(self, instance, validated_data):
+            instance.subjects_of_interest = validated_data.get('subjects_of_interest', instance.subjects_of_interest)
+            instance.subjects_of_interest = validated_data.get('subjects_of_interest', instance.subjects_of_interest)
+            instance.learning_goals = validated_data.get('learning_goals', instance.learning_goals)
+            instance.tutoring_preference = validated_data.get('tutoring_preference', instance.tutoring_preference)
+            instance.frequency_of_tutoring_sessions = validated_data.get('frequency_of_tutoring_sessions', instance.frequency_of_tutoring_sessions)
+            instance.preferred_learning_style = validated_data.get('preferred_learning_style', instance.preferred_learning_style)
+            instance.study_schedule_preferences = validated_data.get('study_schedule_preferences', instance.study_schedule_preferences)
+            instance.mode_of_learning = validated_data.get('mode_of_learning', instance.mode_of_learning)
+            instance.save()
+            return instance
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.EmailField(required = True)

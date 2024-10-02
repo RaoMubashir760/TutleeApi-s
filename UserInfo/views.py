@@ -3,11 +3,11 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from UserInfo.customPermissions import CustomizeAPIPermissions
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .serializer import TutleeUserSerializer, LoginSerializer, AdditionInfoSerializer
+from .serializer import TutleeUserSerializer, LoginSerializer, AdditionInfoSerializer, PrefrenceSerializer
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
-from UserInfo.models import TutleeUser, AdditionalInfo
+from UserInfo.models import TutleeUser, AdditionalInfo, Prefrences
 
 #User only have to enter the mail, For authentication perpose we have to add the username: that is actually the mail
 @api_view(['POST'])
@@ -183,3 +183,80 @@ class DeleteAdditionalInfo(APIView):
             # self.check_object_permissions(request, instance)
             instance.delete()
             return Response({'output':"Info Deleted successfully!!"})
+
+#Preferences side APIes:
+class AddStudentPreferences(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [CustomizeAPIPermissions]
+
+    def post(self, request, pk = None):
+        data = request.data.copy()
+        try:
+            student = TutleeUser.objects.get(id = pk)
+        except:
+            return Response({'output': "User not exists"},status = status.HTTP_404_NOT_FOUND)
+        context = {
+             'student' : student
+        }
+        serialized = PrefrenceSerializer(data = data, many = False, context = context)
+        if not serialized.is_valid():
+            return Response(f"your data is Incomplete, ", status = status.HTTP_400_BAD_REQUEST)
+        serialized.save()
+        print(serialized.data)
+        return Response(serialized.data, status = status.HTTP_201_CREATED)
+
+class GetStudentPreferences(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [CustomizeAPIPermissions]
+
+    def get(self, request, pk = None):
+        try:
+            instance = Prefrences.objects.get(student = pk)
+        except:
+            return Response("User Preferences Not exists ", status = status.HTTP_404_NOT_FOUND)
+        # self.check_object_permissions(request, instance)
+        serialized = PrefrenceSerializer(instance)
+        return Response(serialized.data) 
+
+class UpdateStudentPreferences(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [CustomizeAPIPermissions]
+
+    def put(self, request, pk = None):
+        try:
+            instance = Prefrences.objects.get(student = pk)
+        except:
+            return Response("User Preferences Not exists ", status = status.HTTP_404_NOT_FOUND)
+        # self.check_object_permissions(request, instance)
+        data = request.data
+        serialized = PrefrenceSerializer(instance, data = data)
+        if not serialized.is_valid():
+            return Response(serialized.errors, status = status.HTTP_400_BAD_REQUEST)   
+        serialized.save()
+        return Response(serialized.data)                   
+    
+    def patch(self, request, pk = None):
+        try:
+            instance = Prefrences.objects.get(student = pk)
+        except:
+            return Response("User Preferences Not exists ", status = status.HTTP_404_NOT_FOUND)
+        # self.check_object_permissions(request, instance)
+        data = request.data
+        serialized = PrefrenceSerializer(instance, data = data, partial = True)
+        if not serialized.is_valid():
+            return Response(serialized.errors, status = status.HTTP_400_BAD_REQUEST)   
+        serialized.save()
+        return Response(serialized.data)   
+
+class DeleteStudentPreferences(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [CustomizeAPIPermissions]
+
+    def delete(self, request, pk = None):
+            try:
+                instance = Prefrences.objects.get(student = pk)
+            except:
+                return Response({'output':"Student Info not even exists!!"},status=status.HTTP_404_NOT_FOUND)
+            # self.check_object_permissions(request, instance)
+            instance.delete()
+            return Response({'output':"Preferences Deleted successfully!!"})

@@ -13,9 +13,14 @@ urlpatterns=[
     path('studentDetail/<int:pk>', GetSinglestudent.as_view(), name = 'studentDetail'),
     path('updateStudentProfile/<int:pk>', UpdateStudent.as_view(), name = 'updateUser'),
     path('DeleteStudentProfile/<int:pk>', DeleteStudent.as_view(), name = 'DeleteStudentProfile'),
-    # Additional Info
+    # Additional Info:
     path('AddAdditionalInfo/<int:pk>', AddAdditionalInfo.as_view(), name = 'AddAdditionalInfo'),
     path('UpdateAdditionalInfo/<int:pk>', UpdateAdditionalInfo.as_view(), name = 'UpdateAdditionalInfo'),
     path('GetStudentAdditionalInfo/<int:pk>', GetStudentAdditionalInfo.as_view(), name = 'GetStudentAdditionalInfo'),
     path('DeleteAdditionalInfo/<int:pk>', DeleteAdditionalInfo.as_view(), name = 'DeleteAdditionalInfo'),
+    #Preferences:
+    path('AddStudentPreferences/<int:pk>', AddStudentPreferences.as_view(), name = 'AddStudentPreferences'),
+    path('UpdateStudentPreferences/<int:pk>', UpdateStudentPreferences.as_view(), name = 'UpdateStudentPreferences'),
+    path('GetStudentPreferences/<int:pk>', GetStudentPreferences.as_view(), name = 'GetStudentPreferences'),
+    path('DeleteStudentPreferences/<int:pk>', DeleteStudentPreferences.as_view(), name = 'DeleteStudentPreferences'),
     ]

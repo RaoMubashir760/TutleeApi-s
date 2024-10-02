@@ -34,7 +34,7 @@ class Prefrences(models.Model):
     study_schedule_preferences = models.TextField(null = True, blank = True) 
     mode_of_learning = models.CharField(max_length = 255, null = True, blank = True)  
     tutoring_preference = models.CharField(max_length = 255, null = True, blank = True)  
-    frequency_of_tutoring = models.CharField(max_length = 255, null = True, blank = True) 
+    frequency_of_tutoring_sessions = models.CharField(max_length = 255, null = True, blank = True) 
 
     def __str__(self):
         return f"Prefrences of {self.student}"
